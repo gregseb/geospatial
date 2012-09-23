@@ -21,9 +21,28 @@ $plugin = array(
 /**
  * Process Markup
  */
-function geospatial_shapefile($features, $options = array()) {
+function geospatial_shapefile($wkt_features, $options = array()) {
   geophp_load();
-  return geoPHP::load($features[0]['wkt'], 'wkt');
+  $store_features = array();
+  $wkt = array();
+  
+  foreach ($wkt_features as $wkt_feature) {
+    if (!isset($wkt_feature['WKT']) || empty($wkt_feature)) {
+      continue;
+    }
+    $store_features[] = $wkt_feature['WKT'];
+  }
+  if ($store_features) {
+    // If there is more than one value to save, wrap in GeometryCollection
+    if (isset($store_features[1])) {
+      $wkt = array('wkt' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $store_features)));
+    }
+    else {
+      $wkt = array('wkt' => $store_features[0]);
+    }
+  }
+  
+  return geoPHP::load($wkt['wkt'], 'wkt');
 }
 
 function geospatial_shapefile_field($field, $field_item) {
@@ -32,9 +51,12 @@ function geospatial_shapefile_field($field, $field_item) {
       $file = file_load($field_item['fid']);
       //$data = file_get_contents($file->uri);
       $features = geospatial_shapefile_get_wkt($file->uri);
-      $features = geospatial_file_parse_wkt_features($features);
+      //$features = geospatial_file_parse_wkt_features($features);
       
       return geospatial_shapefile($features);
+    } else {
+      //if there's no file we want to put an empty value into the field.
+      return geospatial_shapefile(array());
     }
   } else {
     // Something has gone wrong...

@@ -5,9 +5,9 @@
  * Module file for geospatial module.
  */
 
-define('SPATIAL_FILE_GROUPING_COLLECTION', 0);
-define('SPATIAL_FILE_GROUPING_MULTIPLE', 1);
-define('SPATIAL_FILE_GROUPING_BYTYPE', 2);
+//define('SPATIAL_FILE_GROUPING_COLLECTION', 0);
+//define('SPATIAL_FILE_GROUPING_MULTIPLE', 1);
+//define('SPATIAL_FILE_GROUPING_BYTYPE', 2);
 
 /**
  * Implements hook_ctools_plugin_directory
@@ -16,119 +16,4 @@ define('SPATIAL_FILE_GROUPING_BYTYPE', 2);
  */
 function geospatial_ctools_plugin_directory($owner, $plugin_type) {
   return 'plugins/' . $plugin_type;
-}
-
-/**
- * Exposed function that other modules may use.
- *
- * Params: $wkt_features as returned by a few different functions
- *         $compress_method how to handle multivalues
- */
-function geospatial_file_parse_wkt_features($wkt_features, $group_multiple_values = SPATIAL_FILE_GROUPING_COLLECTION) {
-  $store_features = array();
-  $return_features = array();
-
-  if (SPATIAL_FILE_GROUPING_BYTYPE == $group_multiple_values) {
-    $geometry_pattern = array(
-      'POINT' => '/^POINT\s*(\(-?\d+\.\d+ -?\d+\.\d+\))$/i',
-      'LINESTRING' => '/^LINESTRING\s*(\(.*\))$/i',
-      'POLYGON' => '/^POLYGON\s*(\(.*\))$/i',
-    );
-    $multiple_string = array(
-      'POINT' => 'MULTIPOINT(%s)',
-      'LINESTRING' => 'MULTILINESTRING(%s)',
-      'POLYGON' => 'MULTIPOLYGON(%s)',
-    );
-  }
-
-  foreach ($wkt_features as $wkt_feature) {
-    if (!isset($wkt_feature['WKT']) || empty($wkt_feature)) {
-      continue;
-    }
-
-    switch ($group_multiple_values) {
-
-      case SPATIAL_FILE_GROUPING_COLLECTION:
-        $store_features[] = $wkt_feature['WKT'];
-        break;
-
-      case SPATIAL_FILE_GROUPING_MULTIPLE:
-        $wkt = array('wkt' => $wkt_feature['WKT']);
-        $return_features[] = geofield_compute_values($wkt);
-        break;
-
-      case SPATIAL_FILE_GROUPING_BYTYPE:
-        $matches = array();
-        $feature_type = '';
-
-        if (preg_match('/^([A-Z]+)/', $wkt_feature['WKT'], $matches)) {
-          $feature_type = $matches[0];
-        }
-
-        switch ($feature_type) {
-
-          case 'POINT':
-          case 'LINESTRING':
-          case 'POLYGON':
-            // These feature types need to be grouped in multiple geometries by type
-            $matches = array();
-            if (preg_match($geometry_pattern[$feature_type], $wkt_feature['WKT'], $matches)) {
-              $store_features[$feature_type][] = $matches[1];
-            }
-            break;
-
-          case 'MULTIPOINT':
-          case 'MULTILINESTRING':
-          case 'MULTIPOLYGON':
-            // TODO: These multiple geometries should be broken up so that there is only one for each type
-            // For now we just don't want hundreds of fields so we can probably save these as they are
-            $wkt = array('wkt' => $wkt_feature['WKT']);
-            $return_features[] = geofield_compute_values($wkt);
-            break;
-
-          case 'GEOMETRYCOLLECTION':
-            // TODO: Any GEOMETRYCOLLECTION features should really be broken up into its types
-            // For now just block it from going in
-            // TODO: Add a message or watchdog or something
-            break;
-        }
-        break;
-
-    }
-  }
-
-  switch ($group_multiple_values) {
-
-    case SPATIAL_FILE_GROUPING_COLLECTION:
-      if ($store_features) {
-        // If there is more than one value to save, wrap in GeometryCollection
-        if (isset($store_features[1])) {
-          $wkt = array('wkt' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $store_features)));
-        }
-        else {
-          $wkt = array('wkt' => $store_features[0]);
-        }
-        $return_features[] = geofield_compute_values($wkt);
-      }
-      break;
-
-    case SPATIAL_FILE_GROUPING_BYTYPE:
-      foreach ($store_features as $feature_type => $features) {
-        switch ($feature_type) {
-          case 'POINT':
-          case 'LINESTRING':
-          case 'POLYGON':
-            // TODO: If there is just one feature of this type then it shouldn't be multi'ed
-            $wkt = array(
-            'wkt' => sprintf($multiple_string[$feature_type], implode(',', $features)),
-            );
-            $return_features[] = geofield_compute_values($wkt);
-            break;
-        }
-      }
-      break;
-
-  }
-
-  return $return_features;
 }
