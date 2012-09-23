@@ -4,3 +4,4 @@ package = Geo Spatial Tools
 core = 7.x
 dependencies[] = ogr2ogr
 dependencies[] = geocoder
+dependencies[] = file
