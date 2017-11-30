@@ -25,7 +25,7 @@ function geospatial_shapefile($wkt_features, $options = array()) {
   geophp_load();
   $store_features = array();
   $wkt = array();
-  
+
   foreach ($wkt_features as $wkt_feature) {
     if (!isset($wkt_feature['WKT']) || empty($wkt_feature)) {
       continue;
@@ -41,7 +41,7 @@ function geospatial_shapefile($wkt_features, $options = array()) {
       $wkt = array('wkt' => $store_features[0]);
     }
   }
-  
+
   return geoPHP::load($wkt['wkt'], 'wkt');
 }
 
@@ -52,7 +52,7 @@ function geospatial_shapefile_field($field, $field_item) {
       //$data = file_get_contents($file->uri);
       $features = geospatial_shapefile_get_wkt($file->uri);
       //$features = geospatial_file_parse_wkt_features($features);
-      
+
       return geospatial_shapefile($features);
     } else {
       //if there's no file we want to put an empty value into the field.

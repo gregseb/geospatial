@@ -11,9 +11,19 @@
 
 /**
  * Implements hook_ctools_plugin_directory
- * 
+ *
  * Tell ctools where to find plugins.
  */
 function geospatial_ctools_plugin_directory($owner, $plugin_type) {
   return 'plugins/' . $plugin_type;
+}
+
+
+/**
+ * Get the ogr2ogr path...
+ */
+function get_ogr2ogr_bin_path() {
+  // If the ogr2ogr variable hasn't been configured, attempt to find it with `which`.
+  $path = variable_get('geospatial_ogr2ogr_path', exec('which ogr2ogr'));
+  return $path;
 }
