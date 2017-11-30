@@ -23,7 +23,6 @@ $plugin = array(
  */
 function geospatial_spatial_file($wkt_features, $options = array()) {
   geophp_load();
-  $store_features = array();
   $wkt = array();
 
   if ($wkt_features) {

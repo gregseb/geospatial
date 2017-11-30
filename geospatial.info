@@ -1,7 +1,6 @@
 name = GeoSpatial
-description = An adaption of Affinity Bridge's spatial7 module that provides a geocoder handler for shapefiles.
+description = "An adaption of Affinity Bridge's spatial7 module that provides a geocoder handler for shapefiles."
 package = Geo Spatial Tools
 core = 7.x
-dependencies[] = ogr2ogr
 dependencies[] = geocoder
 dependencies[] = file

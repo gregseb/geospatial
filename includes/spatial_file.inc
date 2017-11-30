@@ -22,5 +22,7 @@ function parse_wkt_from_spatial_file($uri) {
       array_push($wkt_values, $row[$wkt_key]);
     }
   }
+
+  $ogr2ogr->close();
   return $wkt_values;
 }
