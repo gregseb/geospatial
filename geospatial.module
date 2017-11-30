@@ -18,6 +18,35 @@ function geospatial_ctools_plugin_directory($owner, $plugin_type) {
   return 'plugins/' . $plugin_type;
 }
 
+/**
+ * Implements hook_permission().
+ */
+function geospatial_permission() {
+  return array(
+    'administer geospatial' => array(
+      'title' => t('Administer GeoSpatial'),
+      'description' => t('Access administration pages and settings related to the GeoSpatial module.'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_menu().
+ */
+function geospatial_menu() {
+  $items = array();
+
+  $items['admin/config/content/geospatial'] = array(
+    'title' => 'GeoSpatial',
+    'description' => 'Configure GeoSpatial settings and ogr2ogr options.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('geospatial_admin_settings'),
+    'access arguments' => array('administer geospatial'),
+    'file' => 'includes/geospatial.admin.inc',
+  );
+
+  return $items;
+}
 
 /**
  * Get the ogr2ogr path...
