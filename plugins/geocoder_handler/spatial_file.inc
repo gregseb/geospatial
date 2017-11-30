@@ -26,19 +26,13 @@ function geospatial_spatial_file($wkt_features, $options = array()) {
   $store_features = array();
   $wkt = array();
 
-  foreach ($wkt_features as $wkt_feature) {
-    if (!isset($wkt_feature['WKT']) || empty($wkt_feature)) {
-      continue;
-    }
-    $store_features[] = $wkt_feature['WKT'];
-  }
-  if ($store_features) {
+  if ($wkt_features) {
     // If there is more than one value to save, wrap in GeometryCollection
-    if (isset($store_features[1])) {
-      $wkt = array('wkt' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $store_features)));
+    if (isset($wkt_features[1])) {
+      $wkt = array('wkt' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $wkt_features)));
     }
     else {
-      $wkt = array('wkt' => $store_features[0]);
+      $wkt = array('wkt' => $wkt_features[0]);
     }
   }
 
@@ -67,21 +61,6 @@ function geospatial_spatial_file_field($field, $field_item) {
  * extract geodata from spatial_file.
  */
 function geospatial_spatial_file_get_wkt($spatial_file_uri) {
-  if ($spatial_file = geospatial_spatial_file_open($spatial_file_uri)) {
-    if ($spatial_features = $spatial_file->process()) {
-      return $spatial_features;
-    }
-  }
-
-  return NULL;
-}
-
-/**
- * Open a stream to a Spatial_File
- */
-function geospatial_spatial_file_open($uri) {
-  module_load_include('inc', 'geospatial', 'geospatial_spatial_file.class');
-  if ($spatial_file = new SpatialSpatial_File($uri)) {
-    return $spatial_file;
-  }
+  module_load_include('inc', 'geospatial', 'includes/spatial_file');
+  return parse_wkt_from_spatial_file($spatial_file_uri);
 }
