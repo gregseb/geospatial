@@ -4,7 +4,7 @@
  * Could also look at parsing shapefiles manually: http://en.wikipedia.org/wiki/Shapefile#Shapefile_shape_format_.28.shp.29
  * Could also implement Iterator: http://php.net/manual/en/class.iterator.php
  */
-function parse_wkt_from_spatial_file($uri) {
+function _geospatial_parse_wkt_from_spatial_file($uri) {
   module_load_include('inc', 'geospatial', 'includes/ogr2ogr');
   $wkt_values = array();
 

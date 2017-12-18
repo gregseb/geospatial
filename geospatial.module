@@ -51,8 +51,16 @@ function geospatial_menu() {
 /**
  * Get the ogr2ogr path...
  */
-function get_ogr2ogr_bin_path() {
+function geospatial_get_ogr2ogr_bin_path() {
   // If the ogr2ogr variable hasn't been configured, attempt to find it with `which`.
   $path = variable_get('geospatial_ogr2ogr_path', exec('which ogr2ogr'));
   return $path;
+}
+
+/**
+ * Public wrapper function around the spatial file parsing function
+ */
+function geospatial_parse_wkt_from_spatial_file($uri) {
+  module_load_include('inc', 'geospatial', 'includes/spatial_file');
+  return _geospatial_parse_wkt_from_spatial_file($uri);
 }

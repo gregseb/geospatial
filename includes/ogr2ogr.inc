@@ -4,21 +4,20 @@
  *
  * @todo Restore bulk API compatibility.  It was lost when adding the ability to process multi layered zips.
  */
-
 class ogr2ogr {
-  private $tmpdir;
-  private $type;
-  private $pointer;
-  public $csv;
+//   private $tmpdir;
+//   private $type;
+//   private $pointer;
+//   public $csv;
 
   function __construct($uri) {
     // Get ogr2ogr bin
-    $this->ogr2ogr_bin = geospatial_get_ogr2ogr_path();
+    $this->ogr2ogr_bin = geospatial_get_ogr2ogr_bin_path();
 
     // Create tmp directory
     $tmpdir = tempnam(sys_get_temp_dir(), 'mapshape');
-    unlink($tmpdir);
-    mkdir($tmpdir);
+    unlink($tmpdir);  // If this tmpdir exists already for some reason... remove it.
+    mkdir($tmpdir . "/ogr2ogr", 0777, TRUE);
     $this->tmpdir = $tmpdir;
     $this->uri = $uri;
 
@@ -33,7 +32,7 @@ class ogr2ogr {
   }
 
   private function find_files($type) {
-    return file_scan_directory($this->tmpdir, '/^.*\.(' . $type . ')$/')
+    return file_scan_directory($this->tmpdir, "/^.*\.(" . $type . ")$/");
   }
 
   function prepare() {
@@ -74,7 +73,7 @@ class ogr2ogr {
     array_push($this->ogr2ogr_files, $this->tmpdir . '/ogr2ogr/' . $csv_name);
   }
 
-  private function open() {
+  function open() {
     if (file_exists($this->ogr2ogr_files[$this->current_file_index]) && $this->csv = fopen($this->ogr2ogr_files[$this->current_file_index], 'r')) {
       return TRUE;
     } else {
@@ -127,7 +126,6 @@ class ogr2ogr {
    */
   function close() {
     @fclose($this->csv);
-
     // Remove all files created by this instance.
     file_unmanaged_delete_recursive($this->tmpdir);
   }

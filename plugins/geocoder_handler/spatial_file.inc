@@ -28,14 +28,14 @@ function geospatial_spatial_file($wkt_features, $options = array()) {
   if ($wkt_features) {
     // If there is more than one value to save, wrap in GeometryCollection
     if (isset($wkt_features[1])) {
-      $wkt = array('wkt' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $wkt_features)));
+      $wkt = array('geom' => sprintf('GEOMETRYCOLLECTION(%s)', implode(',', $wkt_features)));
     }
     else {
-      $wkt = array('wkt' => $wkt_features[0]);
+      $wkt = array('geom' => $wkt_features[0]);
     }
   }
 
-  return geoPHP::load($wkt['wkt'], 'wkt');
+  return geoPHP::load($wkt['geom'], 'wkt');
 }
 
 function geospatial_spatial_file_field($field, $field_item) {
@@ -61,5 +61,5 @@ function geospatial_spatial_file_field($field, $field_item) {
  */
 function geospatial_spatial_file_get_wkt($spatial_file_uri) {
   module_load_include('inc', 'geospatial', 'includes/spatial_file');
-  return parse_wkt_from_spatial_file($spatial_file_uri);
+  return _geospatial_parse_wkt_from_spatial_file($spatial_file_uri);
 }
