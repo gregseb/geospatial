@@ -2,6 +2,6 @@
     "name": "gregseb/geospatial",
     "type": "drupal-custom-module",
     "require": {
-        "composer/installers": "~1.0",
+        "composer/installers": "~1.0"
     }
 }
