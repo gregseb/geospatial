@@ -11,9 +11,56 @@
 
 /**
  * Implements hook_ctools_plugin_directory
- * 
+ *
  * Tell ctools where to find plugins.
  */
 function geospatial_ctools_plugin_directory($owner, $plugin_type) {
   return 'plugins/' . $plugin_type;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function geospatial_permission() {
+  return array(
+    'administer geospatial' => array(
+      'title' => t('Administer GeoSpatial'),
+      'description' => t('Access administration pages and settings related to the GeoSpatial module.'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_menu().
+ */
+function geospatial_menu() {
+  $items = array();
+
+  $items['admin/config/content/geospatial'] = array(
+    'title' => 'GeoSpatial',
+    'description' => 'Configure GeoSpatial settings and ogr2ogr options.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('geospatial_admin_settings'),
+    'access arguments' => array('administer geospatial'),
+    'file' => 'includes/geospatial.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Get the ogr2ogr path...
+ */
+function geospatial_get_ogr2ogr_bin_path() {
+  // If the ogr2ogr variable hasn't been configured, attempt to find it with `which`.
+  $path = variable_get('geospatial_ogr2ogr_path', exec('which ogr2ogr'));
+  return $path;
+}
+
+/**
+ * Public wrapper function around the spatial file parsing function
+ */
+function geospatial_parse_wkt_from_spatial_file($uri) {
+  module_load_include('inc', 'geospatial', 'includes/spatial_file');
+  return _geospatial_parse_wkt_from_spatial_file($uri);
 }
